@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { expressjwt } from 'express-jwt';
 import { db } from '../_helpers/db';
-const config = require('../config.json');
+const jwtSecret = process.env.JWT_SECRET || 'default-secret';
 
 export function authorize(roles: string | string[] = []) {
     if (typeof roles === 'string') {
@@ -10,7 +10,7 @@ export function authorize(roles: string | string[] = []) {
 
     return [
         // authenticate JWT token and attach user to request object (req.user)
-        expressjwt({ secret: config.secret, algorithms: ['HS256'] }),
+        expressjwt({ secret: jwtSecret, algorithms: ['HS256'] }),
 
         // authorize based on user role
         async (req: any, res: Response, next: NextFunction) => {
