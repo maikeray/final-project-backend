@@ -7,7 +7,7 @@
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node server.ts",
     "build": "tsc"
-},
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,6 +16,7 @@
     "bcryptjs": "^3.0.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-jwt": "^8.5.1",
     "joi": "^18.2.1",
