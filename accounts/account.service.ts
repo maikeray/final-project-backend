@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { db } from '../_helpers/db';
 import { Role } from '../_helpers/role';
 import { sendEmail } from '../_helpers/send-email';
-const config = require('../config.json');
+const jwtSecret = process.env.JWT_SECRET || 'default-secret';
 
 export const accountService = {
     authenticate,
@@ -181,7 +181,7 @@ async function getRefreshToken(token: string) {
 }
 
 function generateJwtToken(account: any) {
-    return jwt.sign({ sub: account.id, id: account.id }, config.secret, { expiresIn: '15m' });
+    return jwt.sign({ sub: account.id, id: account.id }, jwtSecret, { expiresIn: '15m' });
 }
 
 async function generateRefreshToken(account: any, ipAddress: string) {
