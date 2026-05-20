@@ -28,6 +28,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "typescript": "^6.0.3"
   }
 }
