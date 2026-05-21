@@ -1,5 +1,4 @@
 import { Sequelize } from 'sequelize';
-import mysql2 from 'mysql2';
 
 export const db: any = {};
 
@@ -10,25 +9,21 @@ export async function initialize() {
     const password = process.env.DB_PASSWORD || 'admin1234';
     const database = process.env.DB_NAME || 'node-mysql-boilerplate';
 
-    // create db if it doesn't already exist
-    const connection = await mysql2.createConnection({ host, port, user, password });
-    await connection.promise().query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-
-    // connect to db
+    // connect to db with pool
     const sequelize = new Sequelize(database, user, password, { 
-    dialect: 'mysql',
-    host,
-    port,
-    pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-    },
-    dialectOptions: {
-        connectTimeout: 60000
-    }
-});
+        dialect: 'mysql',
+        host,
+        port,
+        pool: {
+            max: 5,
+            min: 0,
+            acquire: 60000,
+            idle: 10000
+        },
+        dialectOptions: {
+            connectTimeout: 60000
+        }
+    });
 
     // init models and add them to the exported db object
     db.Account = require('../accounts/account.model').accountModel(sequelize);
