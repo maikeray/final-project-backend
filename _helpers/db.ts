@@ -16,10 +16,19 @@ export async function initialize() {
 
     // connect to db
     const sequelize = new Sequelize(database, user, password, { 
-        dialect: 'mysql',
-        host,
-        port
-    });
+    dialect: 'mysql',
+    host,
+    port,
+    pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+    },
+    dialectOptions: {
+        connectTimeout: 60000
+    }
+});
 
     // init models and add them to the exported db object
     db.Account = require('../accounts/account.model').accountModel(sequelize);
