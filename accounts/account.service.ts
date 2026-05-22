@@ -72,7 +72,8 @@ async function revokeToken({ token, ipAddress }: { token: string, ipAddress: str
 
 async function register(params: any, origin: string) {
     if (await db.Account.findOne({ where: { email: params.email } })) {
-        return await sendAlreadyRegisteredEmail(params.email, origin);
+        try { await sendAlreadyRegisteredEmail(params.email, origin); } catch (e) { console.error('Email error:', e); }
+        return;
     }
 
     const account = new db.Account(params);
@@ -82,7 +83,7 @@ async function register(params: any, origin: string) {
     account.passwordHash = bcrypt.hashSync(params.password, 10);
     await account.save();
 
-    await sendVerificationEmail(account, origin);
+    try { await sendVerificationEmail(account, origin); } catch (e) { console.error('Email error:', e); }
 }
 
 async function verifyEmail({ token }: { token: string }) {
