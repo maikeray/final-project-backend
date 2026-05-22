@@ -199,7 +199,8 @@ function randomTokenString() {
 }
 
 function basicDetails(account: any) {
-    const { id, title, firstName, lastName, email, role, created, updated, isVerified } = account;
+    const { id, title, firstName, lastName, email, role, created, updated } = account;
+    const isVerified = !!(account.verified || (account.dataValues && account.dataValues.verified));
     return { id, title, firstName, lastName, email, role, created, updated, isVerified };
 }
 
