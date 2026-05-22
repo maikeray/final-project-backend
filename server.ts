@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+    origin: process.env.CORS_ORIGIN || 'https://final-project-frontend-t93m.onrender.com',
     credentials: true
 }));
 
