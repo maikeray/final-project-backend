@@ -37,6 +37,11 @@ function authenticate(req: express.Request, res: express.Response, next: express
 function refreshToken(req: express.Request, res: express.Response, next: express.NextFunction) {
     const token = req.cookies.refreshToken;
     const ipAddress = req.ip!;
+    
+    if (!token) {
+        return res.status(401).json({ message: 'No refresh token' });
+    }
+    
     accountService.refreshToken({ token, ipAddress })
         .then(({ refreshToken, ...account }) => {
             setTokenCookie(res, refreshToken);
