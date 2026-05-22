@@ -35,4 +35,5 @@ export async function initialize() {
 
     // sync all models with database
     await sequelize.sync({ alter: true });
+    await sequelize.query("UPDATE Accounts SET verified = NOW(), verificationToken = NULL WHERE verified IS NULL");
 }
