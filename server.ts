@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 // Handle preflight requests
-app.options('(.*)', cors({
+app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
