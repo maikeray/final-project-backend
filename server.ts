@@ -14,7 +14,8 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors({
+// Handle preflight requests
+app.options('*', cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization'],
