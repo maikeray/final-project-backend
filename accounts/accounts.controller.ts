@@ -35,7 +35,7 @@ function authenticate(req: express.Request, res: express.Response, next: express
 }
 
 function refreshToken(req: express.Request, res: express.Response, next: express.NextFunction) {
-    const token = req.cookies.refreshToken;
+    const token = req.cookies.refreshToken || req.body.token;
     const ipAddress = req.ip!;
     
     if (!token) {
@@ -204,6 +204,7 @@ function updateSchema(req: express.Request, res: express.Response, next: express
         firstName: Joi.string().empty(''),
         lastName: Joi.string().empty(''),
         email: Joi.string().email().empty(''),
+        role: Joi.string().valid(Role.Admin, Role.User).empty(''),
         password: Joi.string().min(6).empty(''),
         confirmPassword: Joi.string().valid(Joi.ref('password')).empty('')
     }).with('password', 'confirmPassword');
