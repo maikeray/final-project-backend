@@ -1,0 +1,766 @@
+xampp/htdocs/...
+natingor.py
+
+python -m pip install mysql-connector-python
+
+
+CREATE TABLE events (
+    evCode INT AUTO_INCREMENT PRIMARY KEY,
+    evName VARCHAR(150) NOT NULL,
+    evDate DATE NOT NULL,
+    evVenue VARCHAR(150) NOT NULL,
+    evRFee DECIMAL(10,2) NOT NULL
+);
+
+CREATE TABLE participants (
+    partID INT AUTO_INCREMENT PRIMARY KEY,
+    evCode INT NOT NULL,
+    fName VARCHAR(100) NOT NULL,
+    lName VARCHAR(100) NOT NULL,
+    partRate DECIMAL(5,2) DEFAULT 0,
+    FOREIGN KEY (evCode) REFERENCES events(evCode)
+);
+
+CREATE TABLE registration (
+    regCode INT AUTO_INCREMENT PRIMARY KEY,
+    partID INT NOT NULL,
+    regDate DATE NOT NULL,
+    regFeePaid DECIMAL(10,2) NOT NULL,
+    regPayMode VARCHAR(20) NOT NULL,
+    FOREIGN KEY (partID) REFERENCES participants(partID)
+);
+
+
+ALTER TABLE participants
+CHANGE fName partFName TEXT NOT NULL,
+CHANGE lName partLName TEXT NOT NULL,
+CHANGE partRate partDRate DECIMAL(5,2) NOT NULL DEFAULT 0.00;
+
+
+
+import mysql.connector
+
+# DATABASE CONNECTION
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="events_registration_db",
+    port=3306
+)
+
+cursor = conn.cursor()
+
+print("Database connected successfully!")
+
+
+# EVENTS MANAGEMENT
+def events_management():
+
+    while True:
+        print("\n===== EVENTS MANAGEMENT =====")
+        print("1. Add Event")
+        print("2. View Events")
+        print("3. Search Event")
+        print("4. Update Event")
+        print("5. Delete Event")
+        print("6. Back to Main Menu")
+
+        choice = input("\nEnter your choice: ")
+
+        # ADD EVENT
+        if choice == "1":
+
+            evName = input("Enter Event Name: ")
+            evDate = input("Enter Event Date (YYYY-MM-DD): ")
+            evVenue = input("Enter Event Venue: ")
+            evRFee = float(input("Enter Registration Fee: "))
+
+            sql = """
+                INSERT INTO events
+                (evName, evDate, evVenue, evRFee)
+                VALUES (%s, %s, %s, %s)
+            """
+
+            values = (evName, evDate, evVenue, evRFee)
+
+            cursor.execute(sql, values)
+            conn.commit()
+
+            print("\nEvent added successfully!")
+
+        # VIEW EVENTS
+        elif choice == "2":
+
+            sql = "SELECT * FROM events"
+            cursor.execute(sql)
+
+            records = cursor.fetchall()
+
+            print("\n========== EVENT RECORDS ==========")
+
+            if records:
+                for row in records:
+                    print("--------------------------------")
+                    print("Event Code:", row[0])
+                    print("Event Name:", row[1])
+                    print("Event Date:", row[2])
+                    print("Event Venue:", row[3])
+                    print("Registration Fee:", row[4])
+            else:
+                print("No events found.")
+
+        # SEARCH EVENT
+        elif choice == "3":
+
+            evCode = input("\nEnter Event Code to search: ")
+
+            sql = "SELECT * FROM events WHERE evCode = %s"
+            values = (evCode,)
+
+            cursor.execute(sql, values)
+            record = cursor.fetchone()
+
+            if record:
+                print("\n========== EVENT FOUND ==========")
+                print("Event Code:", record[0])
+                print("Event Name:", record[1])
+                print("Event Date:", record[2])
+                print("Event Venue:", record[3])
+                print("Registration Fee:", record[4])
+            else:
+                print("\nEvent not found!")
+
+        # UPDATE EVENT
+        elif choice == "4":
+
+            evCode = input("Enter Event Code to update: ")
+
+            sql = "SELECT * FROM events WHERE evCode = %s"
+            cursor.execute(sql, (evCode,))
+
+            record = cursor.fetchone()
+
+            if record:
+
+                print("\n========== CURRENT EVENT DETAILS ==========")
+                print("Event Name:", record[1])
+                print("Event Date:", record[2])
+                print("Event Venue:", record[3])
+                print("Registration Fee:", record[4])
+
+                evName = input("Enter New Event Name: ")
+                evDate = input("Enter New Event Date (YYYY-MM-DD): ")
+                evVenue = input("Enter New Event Venue: ")
+                evRFee = float(input("Enter New Registration Fee: "))
+
+                sql = """
+                    UPDATE events
+                    SET evName = %s,
+                        evDate = %s,
+                        evVenue = %s,
+                        evRFee = %s
+                    WHERE evCode = %s
+                """
+
+                values = (evName, evDate, evVenue, evRFee, evCode)
+
+                cursor.execute(sql, values)
+                conn.commit()
+
+                print("\nEvent updated successfully!")
+
+            else:
+                print("\nEvent not found!")
+
+        # DELETE EVENT
+        elif choice == "5":
+
+            evCode = input("Enter Event Code to delete: ")
+
+            sql = "SELECT * FROM events WHERE evCode = %s"
+            cursor.execute(sql, (evCode,))
+
+            record = cursor.fetchone()
+
+            if record:
+
+                print("\n========== EVENT DETAILS ==========")
+                print("Event Code:", record[0])
+                print("Event Name:", record[1])
+
+                confirm = input("\nAre you sure you want to delete this event? (Y/N): ")
+
+                if confirm.upper() == "Y":
+
+                    sql = "DELETE FROM events WHERE evCode = %s"
+                    cursor.execute(sql, (evCode,))
+                    conn.commit()
+
+                    print("\nEvent deleted successfully!")
+
+                else:
+                    print("\nDeletion cancelled.")
+
+            else:
+                print("\nEvent not found!")
+
+        # BACK TO MAIN MENU
+        elif choice == "6":
+
+            break
+
+        else:
+            print("\nInvalid choice! Please try again.")
+
+
+# PARTICIPANTS MANAGEMENT
+def participants_management():
+
+    print("\n===== PARTICIPANTS MANAGEMENT =====")
+    print("1. Add Participant")
+    print("2. View Participants")
+    print("3. Search Participant")
+    print("4. Update Participant")
+    print("5. Delete Participant")
+    print("6. Back to Main Menu")
+
+
+    choice = input("\nEnter your choice: ")
+
+    # ADD PARTICIPANT
+    if choice == "1":
+
+        print("\n========== AVAILABLE EVENTS ==========")
+
+        cursor.execute("SELECT evCode, evName FROM events")
+        events = cursor.fetchall()
+
+        if events:
+
+            for event in events:
+                print("----------------------------")
+                print("Event Code:", event[0])
+                print("Event Name:", event[1])
+
+        else:
+            print("\nNo events available. Please add an event first.")
+            return
+
+        evCode = input("\nEnter Event Code: ")
+
+        cursor.execute(
+            "SELECT evCode FROM events WHERE evCode = %s",
+            (evCode,)
+        )
+
+        event = cursor.fetchone()
+
+        if event:
+
+            partFName = input("Enter First Name: ")
+            partLName = input("Enter Last Name: ")
+            partDRate = float(input("Enter Discount Rate (%): "))
+
+            sql = """
+                INSERT INTO participants
+                (evCode, partFName, partLName, partDRate)
+                VALUES (%s, %s, %s, %s)
+            """
+
+            values = (evCode, partFName, partLName, partDRate)
+
+            cursor.execute(sql, values)
+            conn.commit()
+
+            print("\nParticipant added successfully!")
+
+        else:
+            print("\nEvent not found!")
+
+            
+    # VIEW PARTICIPANTS
+    elif choice == "2":
+
+        sql = """
+            SELECT
+                p.partID,
+                p.evCode,
+                p.partFName,
+                p.partLName,
+                p.partDRate,
+                e.evName
+            FROM participants p
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+        """
+
+        cursor.execute(sql)
+        records = cursor.fetchall()
+
+        print("\n========== PARTICIPANT RECORDS ==========")
+
+        if records:
+
+            for row in records:
+
+                print("--------------------------------")
+                print("Participant ID:", row[0])
+                print("Event Code:", row[1])
+                print("First Name:", row[2])
+                print("Last Name:", row[3])
+                print("Discount Rate:", row[4], "%")
+                print("Event Name:", row[5])
+
+        else:
+            print("No participants found.")
+
+
+    # SEARCH PARTICIPANT
+    elif choice == "3":
+
+        partID = input("\nEnter Participant ID to search: ")
+
+        sql = """
+            SELECT
+                p.partID,
+                p.evCode,
+                p.partFName,
+                p.partLName,
+                p.partDRate,
+                e.evName
+            FROM participants p
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+            WHERE p.partID = %s
+        """
+
+        cursor.execute(sql, (partID,))
+        record = cursor.fetchone()
+
+        if record:
+
+            print("\n========== PARTICIPANT FOUND ==========")
+            print("Participant ID:", record[0])
+            print("Event Code:", record[1])
+            print("First Name:", record[2])
+            print("Last Name:", record[3])
+            print("Discount Rate:", record[4], "%")
+            print("Event Name:", record[5])
+
+        else:
+            print("\nParticipant not found!")
+
+
+    # UPDATE PARTICIPANT
+    elif choice == "4":
+
+        partID = input("\nEnter Participant ID to update: ")
+
+        sql = """
+            SELECT * FROM participants
+            WHERE partID = %s
+        """
+
+        cursor.execute(sql, (partID,))
+        record = cursor.fetchone()
+
+        if record:
+
+            print("\n========== CURRENT PARTICIPANT DETAILS ==========")
+            print("Participant ID:", record[0])
+            print("Event Code:", record[1])
+            print("First Name:", record[2])
+            print("Last Name:", record[3])
+            print("Discount Rate:", record[4])
+
+            evCode = input("\nEnter New Event Code: ")
+            partFName = input("Enter New First Name: ")
+            partLName = input("Enter New Last Name: ")
+            partDRate = float(input("Enter New Discount Rate (%): "))
+
+            cursor.execute(
+                "SELECT evCode FROM events WHERE evCode = %s",
+                (evCode,)
+            )
+
+            event = cursor.fetchone()
+
+            if event:
+
+                sql = """
+                    UPDATE participants
+                    SET evCode = %s,
+                        partFName = %s,
+                        partLName = %s,
+                        partDRate = %s
+                    WHERE partID = %s
+                """
+
+                values = (
+                    evCode,
+                    partFName,
+                    partLName,
+                    partDRate,
+                    partID
+                )
+
+                cursor.execute(sql, values)
+                conn.commit()
+
+                print("\nParticipant updated successfully!")
+
+            else:
+                print("\nEvent not found!")
+
+        else:
+            print("\nParticipant not found!")
+
+
+    # DELETE PARTICIPANT
+    elif choice == "5":
+
+        partID = input("\nEnter Participant ID to delete: ")
+
+        sql = """
+            SELECT * FROM participants
+            WHERE partID = %s
+        """
+
+        cursor.execute(sql, (partID,))
+        record = cursor.fetchone()
+
+        if record:
+
+            print("\n========== PARTICIPANT DETAILS ==========")
+            print("Participant ID:", record[0])
+            print("First Name:", record[2])
+            print("Last Name:", record[3])
+
+            confirm = input(
+                "\nAre you sure you want to delete this participant? (Y/N): "
+            )
+
+            if confirm.upper() == "Y":
+
+                sql = """
+                    DELETE FROM participants
+                    WHERE partID = %s
+                """
+
+                cursor.execute(sql, (partID,))
+                conn.commit()
+
+                print("\nParticipant deleted successfully!")
+
+            else:
+                print("\nDeletion cancelled.")
+
+        else:
+            print("\nParticipant not found!")
+
+
+# PARTICIPANT REGISTRATION
+def participant_registration():
+
+    print("\n===== PARTICIPANT REGISTRATION =====")
+    print("1. Register Participant")
+    print("2. View Registrations")
+    print("3. Back to Main Menu")
+
+    choice = input("\nEnter your choice: ")
+
+    # REGISTER PARTICIPANT
+    if choice == "1":
+
+        partID = input("\nEnter Participant ID: ")
+
+        sql = """
+            SELECT
+                p.partID,
+                p.partFName,
+                p.partLName,
+                p.partDRate,
+                e.evName,
+                e.evRFee
+            FROM participants p
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+            WHERE p.partID = %s
+        """
+
+        cursor.execute(sql, (partID,))
+        participant = cursor.fetchone()
+
+        if participant:
+
+            print("\n========== PARTICIPANT DETAILS ==========")
+            print("Participant ID:", participant[0])
+            print("First Name:", participant[1])
+            print("Last Name:", participant[2])
+            print("Event Name:", participant[4])
+            print("Registration Fee:", participant[5])
+            print("Discount Rate:", participant[3], "%")
+
+            regDate = input("\nEnter Registration Date (YYYY-MM-DD): ")
+
+            discount = float(participant[5]) * float(participant[3]) / 100
+            regFeePaid = float(participant[5]) - discount
+
+            print("\nDiscount Amount:", discount)
+            print("Final Registration Fee:", regFeePaid)
+
+            regPayMode = input(
+                "Enter Payment Mode (Cash/GCash/Bank): "
+            )
+
+            sql = """
+                INSERT INTO registration
+                (partID, regDate, regFeePaid, regPayMode)
+                VALUES (%s, %s, %s, %s)
+            """
+
+            values = (
+                partID,
+                regDate,
+                regFeePaid,
+                regPayMode
+            )
+
+            cursor.execute(sql, values)
+            conn.commit()
+
+            print("\nParticipant registered successfully!")
+
+        else:
+            print("\nParticipant not found!")
+
+
+    # VIEW REGISTRATIONS
+    elif choice == "2":
+
+        sql = """
+            SELECT
+                r.regCode,
+                r.partID,
+                p.partFName,
+                p.partLName,
+                e.evName,
+                r.regDate,
+                r.regFeePaid,
+                r.regPayMode
+            FROM registration r
+            INNER JOIN participants p
+            ON r.partID = p.partID
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+        """
+
+        cursor.execute(sql)
+        records = cursor.fetchall()
+
+        print("\n========== REGISTRATION RECORDS ==========")
+
+        if records:
+
+            for row in records:
+
+                print("--------------------------------")
+                print("Registration Code:", row[0])
+                print("Participant ID:", row[1])
+                print("First Name:", row[2])
+                print("Last Name:", row[3])
+                print("Event Name:", row[4])
+                print("Registration Date:", row[5])
+                print("Fee Paid:", row[6])
+                print("Payment Mode:", row[7])
+
+        else:
+            print("No registrations found.")
+
+
+# REGISTRATION MONITORING
+def registration_monitoring():
+
+    print("\n===== REGISTRATION MONITORING =====")
+    print("1. View All Registrations")
+    print("2. Filter by Event Name")
+    print("3. View Registration Summary")
+    print("4. Back to Main Menu")
+
+
+    choice = input("\nEnter your choice: ")
+
+    # VIEW ALL REGISTRATIONS
+    if choice == "1":
+
+        sql = """
+            SELECT
+                r.regCode,
+                p.partID,
+                p.partFName,
+                p.partLName,
+                e.evName,
+                e.evDate,
+                e.evVenue,
+                r.regDate,
+                r.regFeePaid,
+                r.regPayMode
+            FROM registration r
+            INNER JOIN participants p
+            ON r.partID = p.partID
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+        """
+
+        cursor.execute(sql)
+        records = cursor.fetchall()
+
+        print("\n========== ALL REGISTRATIONS ==========")
+
+        if records:
+
+            for row in records:
+
+                print("--------------------------------")
+                print("Registration Code:", row[0])
+                print("Participant ID:", row[1])
+                print("Participant Name:", row[2], row[3])
+                print("Event Name:", row[4])
+                print("Event Date:", row[5])
+                print("Event Venue:", row[6])
+                print("Registration Date:", row[7])
+                print("Registration Fee Paid:", row[8])
+                print("Payment Mode:", row[9])
+
+        else:
+            print("No registrations found.")
+
+
+    # FILTER BY EVENT NAME
+    elif choice == "2":
+
+        evName = input("\nEnter Event Name to filter: ")
+
+        sql = """
+            SELECT
+                r.regCode,
+                p.partID,
+                p.partFName,
+                p.partLName,
+                e.evName,
+                r.regDate,
+                r.regFeePaid,
+                r.regPayMode
+            FROM registration r
+            INNER JOIN participants p
+            ON r.partID = p.partID
+            INNER JOIN events e
+            ON p.evCode = e.evCode
+            WHERE e.evName LIKE %s
+        """
+
+        values = ("%" + evName + "%",)
+
+        cursor.execute(sql, values)
+        records = cursor.fetchall()
+
+        print("\n========== FILTERED REGISTRATIONS ==========")
+
+        if records:
+
+            for row in records:
+
+                print("--------------------------------")
+                print("Registration Code:", row[0])
+                print("Participant ID:", row[1])
+                print("Participant Name:", row[2], row[3])
+                print("Event Name:", row[4])
+                print("Registration Date:", row[5])
+                print("Fee Paid:", row[6])
+                print("Payment Mode:", row[7])
+
+        else:
+            print("No registrations found for this event.")
+
+
+    # VIEW REGISTRATION SUMMARY
+    elif choice == "3":
+
+        sql = """
+            SELECT
+                e.evCode,
+                e.evName,
+                COUNT(r.regCode),
+                COALESCE(SUM(r.regFeePaid), 0)
+            FROM events e
+            LEFT JOIN participants p
+            ON e.evCode = p.evCode
+            LEFT JOIN registration r
+            ON p.partID = r.partID
+            GROUP BY e.evCode, e.evName
+        """
+
+        cursor.execute(sql)
+        records = cursor.fetchall()
+
+        print("\n========== REGISTRATION SUMMARY ==========")
+
+        if records:
+
+            for row in records:
+
+                print("--------------------------------")
+                print("Event Code:", row[0])
+                print("Event Name:", row[1])
+                print("Total Registrations:", row[2])
+                print("Total Fees Collected: ₱", row[3])
+
+        else:
+            print("No event records found.")
+
+# MAIN MENU
+while True:
+
+    print("\n================================")
+    print("     EVENTS REGISTRATION SYSTEM")
+    print("================================")
+    print("1. Events Management")
+    print("2. Participants Management")
+    print("3. Participant Registration")
+    print("4. Events Registration Monitoring")
+    print("5. Exit")
+
+    choice = input("\nEnter your choice: ")
+
+    if choice == "1":
+
+        events_management()
+
+    elif choice == "2":
+
+        participants_management()
+        
+
+    elif choice == "3":
+
+        participant_registration()
+
+    elif choice == "4":
+
+        registration_monitoring()
+
+    elif choice == "5":
+
+        print("\nThank you for using the system!")
+        break
+
+    else:
+
+        print("\nInvalid choice! Please try again.")
+
+
+# CLOSE DATABASE CONNECTION
+cursor.close()
+conn.close()
+
