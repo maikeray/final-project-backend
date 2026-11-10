@@ -36,7 +36,11 @@ CHANGE fName partFName TEXT NOT NULL,
 CHANGE lName partLName TEXT NOT NULL,
 CHANGE partRate partDRate DECIMAL(5,2) NOT NULL DEFAULT 0.00;
 
+//htmlcss// connect main-app
+py -m pip install flask
 
+
+//main//
 
 import mysql.connector
 

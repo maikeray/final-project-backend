@@ -1,0 +1,2105 @@
+events_registration
+	templates
+		edit_event.html
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Event</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/events" class="logout">Back</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Update Event</h2>
+
+        <div class="section">
+
+            <h3 class="section-title">Edit Event Information</h3>
+
+            <form action="/events/update/{{ event[0] }}" method="POST">
+
+                <div class="form-group">
+                    <label>Event Name:</label>
+                    <input
+                        type="text"
+                        name="evName"
+                        value="{{ event[1] }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Event Date:</label>
+                    <input
+                        type="date"
+                        name="evDate"
+                        value="{{ event[2] }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Event Venue:</label>
+                    <input
+                        type="text"
+                        name="evVenue"
+                        value="{{ event[3] }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Registration Fee:</label>
+                    <input
+                        type="number"
+                        name="evRFee"
+                        value="{{ event[4] }}"
+                        step="0.01"
+                        min="0"
+                        required
+                    >
+                </div>
+
+                <button type="submit">Save Changes</button>
+
+                <a href="/events" class="button secondary">Cancel</a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		edit_participant.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Participant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/participants" class="logout">Back</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Update Participant</h2>
+
+        <div class="section">
+
+            <h3 class="section-title">Edit Participant Information</h3>
+
+            <form action="/participants/update/{{ participant[0] }}" method="POST">
+
+                <div class="form-group">
+                    <label>Select Event:</label>
+
+                    <select name="evCode" required>
+
+                        {% for event in events %}
+
+                            <option
+                                value="{{ event[0] }}"
+                                {% if event[0] == participant[1] %}selected{% endif %}
+                            >
+                                {{ event[1] }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>First Name:</label>
+                    <input
+                        type="text"
+                        name="partFName"
+                        value="{{ participant[2] }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name:</label>
+                    <input
+                        type="text"
+                        name="partLName"
+                        value="{{ participant[3] }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>Discount Rate (%):</label>
+                    <input
+                        type="number"
+                        name="partDRate"
+                        value="{{ participant[4] }}"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        required
+                    >
+                </div>
+
+                <button type="submit">Save Changes</button>
+
+                <a href="/participants" class="button secondary">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		edit_registration.html
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Registration</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        header {
+            background: #1769AA;
+            color: white;
+            padding: 22px 30px;
+        }
+
+        header h2 {
+            margin: 0;
+        }
+
+        nav {
+            background: #EAF3FB;
+            padding: 15px 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #104B7A;
+            font-weight: bold;
+            margin-right: 25px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 35px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        h3 {
+            color: #104B7A;
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button, .cancel {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 11px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        button {
+            background: #1769AA;
+            color: white;
+        }
+
+        button:hover {
+            background: #104B7A;
+        }
+
+        .cancel {
+            background: #ddd;
+            color: #333;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>EVENTS REGISTRATION SYSTEM</h2>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/events">Events</a>
+    <a href="/participants">Participants</a>
+    <a href="/registration">Registration</a>
+</nav>
+
+<div class="container">
+
+    <h3>Edit Registration #{{ registration[0] }}</h3>
+
+    <form action="/registration/update/{{ registration[0] }}" method="POST">
+
+        <label>Participant</label>
+
+        <select name="partID" required>
+            {% for participant in participants %}
+                <option value="{{ participant[0] }}"
+                    {% if participant[0] == registration[1] %}selected{% endif %}>
+                    {{ participant[0] }} - {{ participant[1] }}
+                    {{ participant[2] }} ({{ participant[3] }})
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Registration Date</label>
+
+        <input
+            type="date"
+            name="regDate"
+            value="{{ registration[2].strftime('%Y-%m-%d') }}"
+            required
+        >
+
+        <label>Payment Mode</label>
+
+        <select name="regPayMode" required>
+            <option value="Cash"
+                {% if registration[3] == 'Cash' %}selected{% endif %}>
+                Cash
+            </option>
+
+            <option value="GCash"
+                {% if registration[3] == 'GCash' %}selected{% endif %}>
+                GCash
+            </option>
+
+            <option value="Bank"
+                {% if registration[3] == 'Bank' %}selected{% endif %}>
+                Bank
+            </option>
+        </select>
+
+        <button type="submit">Update Registration</button>
+
+        <a href="/registration" class="cancel">Cancel</a>
+
+    </form>
+
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		events.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Events Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/" class="logout">Dashboard</a>
+    </div>
+
+    <div class="navigation">
+    <a href="/">Dashboard</a>
+    <a href="/events" class="active">Events</a>
+    <a href="/participants">Participants</a>
+    <a href="/registration">Registration</a>
+    <a href="/monitoring">Monitoring</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Events Management</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="success">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- ADD EVENT -->
+        <div class="section">
+
+            <h3 class="section-title">Add Event</h3>
+
+            <form action="/events/add" method="POST">
+
+                <div class="form-group">
+                    <label>Event Name:</label>
+                    <input type="text" name="evName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Date:</label>
+                    <input type="date" name="evDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Event Venue:</label>
+                    <input type="text" name="evVenue" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Registration Fee:</label>
+                    <input type="number" name="evRFee" step="0.01" min="0" required>
+                </div>
+
+                <button type="submit">Add Event</button>
+                <button type="reset" class="secondary">Clear</button>
+
+            </form>
+
+        </div>
+
+
+        <!-- EVENT RECORDS -->
+        <div class="section">
+
+            <h3 class="section-title">Event Records</h3>
+
+            <form action="/events" method="GET" class="search-form">
+
+                <label>Search:</label>
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Enter event name..."
+                    value="{{ search }}"
+                >
+
+                <button type="submit">Search</button>
+
+                <a href="/events" class="button secondary">View All</a>
+
+            </form>
+
+            <table>
+
+                <tr>
+                    <th>Event Code</th>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Venue</th>
+                    <th>Registration Fee</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for event in events %}
+
+                <tr>
+                    <td>{{ event[0] }}</td>
+                    <td>{{ event[1] }}</td>
+                    <td>{{ event[2] }}</td>
+                    <td>{{ event[3] }}</td>
+                    <td>₱{{ "%.2f"|format(event[4]|float) }}</td>
+
+                    <td class="actions">
+
+                        <a href="/events/edit/{{ event[0] }}" class="button">
+                            Update
+                        </a>
+
+                        <form
+                            action="/events/delete/{{ event[0] }}"
+                            method="POST"
+                            class="inline-form"
+                        >
+                            <button type="submit" class="delete">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="6">No event records found.</td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		index.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Events Registration System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="#" class="logout">Logout</a>
+    </div>
+
+    <div class="navigation">
+        <a href="/" class="active">Dashboard</a>
+        <a href="/events" class="module">Events
+             <h3>Events Management</h3>
+            <p>Add, search, update, delete and view events.</p>
+        </a>
+        <a href="/participants" class="module">
+        <h3>Participants Management</h3>
+        <p>Add, search, update, delete and view participants.</p>
+        </a>
+          <a href="/registration" class="module">
+        <h3>Participant Registration</h3>
+        <p>Register participants and calculate fees.</p>
+        </a>
+          <a href="#" class="module">
+        <h3>Registration Monitoring</h3>
+        <p>View and monitor registration records.</p>
+        </a>
+    </div>
+
+    <div class="container">
+
+        <h2>Dashboard</h2>
+        <p>Welcome to Events Registration System!</p>
+
+        {% if error %}
+            <p class="error">Database Error: {{ error }}</p>
+        {% endif %}
+
+        <div class="dashboard-boxes">
+
+            <div class="box">
+                <h3>Events</h3>
+                <h1>{{ events_count }}</h1>
+                <p>Total Events</p>
+            </div>
+
+            <div class="box">
+                <h3>Participants</h3>
+                <h1>{{ participants_count }}</h1>
+                <p>Total Participants</p>
+            </div>
+
+            <div class="box">
+                <h3>Registrations</h3>
+                <h1>{{ registrations_count }}</h1>
+                <p>Total Registrations</p>
+            </div>
+
+        </div>
+
+        <h3>System Modules</h3>
+
+        <div class="modules">
+
+            <a href="#" class="module">
+                <h3>Events Management</h3>
+                <p>Add, search, update, delete and view events.</p>
+            </a>
+
+            <a href="#" class="module">
+                <h3>Participants Management</h3>
+                <p>Add, search, update, delete and view participants.</p>
+            </a>
+
+            <a href="#" class="module">
+                <h3>Participant Registration</h3>
+                <p>Register participants and calculate fees.</p>
+            </a>
+
+            <a href="#" class="module">
+                <h3>Registration Monitoring</h3>
+                <p>View and monitor registration records.</p>
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		monitoring.html
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Events Registration Monitoring</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .filter-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .filter-section select {
+            padding: 10px;
+            width: 300px;
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .summary-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-left: 5px solid #1769AA;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+        }
+
+        .summary-card h4 {
+            color: #555;
+            margin: 0 0 10px;
+        }
+
+        .summary-card h2 {
+            color: #1769AA;
+            margin: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .filter-button {
+            background: #1769AA;
+            color: white;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-button:hover {
+            background: #104B7A;
+        }
+
+        .clear-button {
+            display: inline-block;
+            background: #ddd;
+            color: #333;
+            padding: 10px 18px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 700px) {
+            .summary-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/" class="logout">Dashboard</a>
+    </div>
+
+    <!-- NAVIGATION -->
+    <div class="navigation">
+        <a href="/">Dashboard</a>
+        <a href="/events">Events</a>
+        <a href="/participants">Participants</a>
+        <a href="/registration">Registration</a>
+        <a href="/monitoring" class="active">Monitoring</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Events Registration Monitoring</h2>
+
+        <!-- FILTER -->
+        <div class="section">
+
+            <h3 class="section-title">Filter Registration Records</h3>
+
+            <form action="/monitoring" method="GET">
+
+                <div class="filter-section">
+
+                    <label><strong>Event Name:</strong></label>
+                    <br><br>
+
+                    <select name="evCode" required>
+
+                        <option value="">-- Select Event --</option>
+
+                        {% for event in events %}
+
+                            <option value="{{ event[0] }}"
+                                {% if selected_evCode == event[0] %}selected{% endif %}>
+
+                                {{ event[1] }}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <br><br>
+
+                    <button type="submit" class="filter-button">
+                        Filter Records
+                    </button>
+
+                    <a href="/monitoring" class="clear-button">
+                        Clear
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        {% if selected_evCode is not none %}
+
+        <!-- SUMMARY -->
+        <div class="section">
+
+            <h3 class="section-title">Registration Summary</h3>
+
+            <div class="summary-container">
+
+                <div class="summary-card">
+                    <h4>Total Registrations</h4>
+                    <h2>{{ total_count }}</h2>
+                </div>
+
+                <div class="summary-card">
+                    <h4>Total Registration Fees Paid</h4>
+                    <h2>₱{{ "%.2f"|format(total_fees|float) }}</h2>
+                </div>
+
+                <div class="summary-card">
+                    <h4>Total Discounts</h4>
+                    <h2>₱{{ "%.2f"|format(total_discounts|float) }}</h2>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- REGISTRATION RESULTS -->
+        <div class="section">
+
+            <h3 class="section-title">Filtered Registration Records</h3>
+
+            <div class="table-container">
+
+                <table>
+
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Participant's Full Name</th>
+                        <th>Registration Date</th>
+                        <th>Registration Fee Paid</th>
+                    </tr>
+
+                    {% for record in registrations %}
+
+                    <tr>
+
+                        <td>{{ record[0] }}</td>
+
+                        <td>{{ record[1] }}</td>
+
+                        <td>{{ record[2] }}</td>
+
+                        <td>
+                            ₱{{ "%.2f"|format(record[3]|float) }}
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+                        <td colspan="4">
+                            No registration records found for this event.
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </table>
+
+            </div>
+
+        </div>
+
+        {% else %}
+
+            <div class="section">
+                <p>Please select an event name to display its registration records and summary.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		participants.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Participants Management</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/" class="logout">Dashboard</a>
+    </div>
+
+    <div class="navigation">
+        <a href="/">Dashboard</a>
+        <a href="/events">Events</a>
+        <a href="/participants" class="active">Participants</a>
+        <a href="/registration">Registration</a>
+        <a href="/monitoring">Monitoring</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Participants Management</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="success">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <!-- ADD PARTICIPANT -->
+        <div class="section">
+
+            <h3 class="section-title">Add Participant</h3>
+
+            <form action="/participants/add" method="POST">
+
+                <div class="form-group">
+                    <label>Select Event:</label>
+
+                    <select name="evCode" required>
+                        <option value="">-- Select Event --</option>
+
+                        {% for event in events %}
+                            <option value="{{ event[0] }}">
+                                {{ event[1] }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>First Name:</label>
+                    <input type="text" name="partFName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Last Name:</label>
+                    <input type="text" name="partLName" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Discount Rate (%):</label>
+                    <input
+                        type="number"
+                        name="partDRate"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        value="0"
+                        required
+                    >
+                </div>
+
+                <button type="submit">Add Participant</button>
+                <button type="reset" class="secondary">Clear</button>
+
+            </form>
+
+        </div>
+
+
+        <!-- PARTICIPANT RECORDS -->
+        <div class="section">
+
+            <h3 class="section-title">Participant Records</h3>
+
+            <form action="/participants" method="GET" class="search-form">
+
+                <label>Search Participant:</label>
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Enter first or last name..."
+                    value="{{ search }}"
+                >
+
+                <button type="submit">Search</button>
+
+                <a href="/participants" class="button secondary">
+                    View All
+                </a>
+
+            </form>
+
+
+            <table>
+
+                <tr>
+                    <th>Participant ID</th>
+                    <th>Event Name</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Discount Rate</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for participant in participants %}
+
+                <tr>
+
+                    <td>{{ participant[0] }}</td>
+                    <td>{{ participant[5] or 'N/A' }}</td>
+                    <td>{{ participant[2] }}</td>
+                    <td>{{ participant[3] }}</td>
+                    <td>{{ participant[4] }}%</td>
+
+                    <td class="actions">
+
+                        <a
+                            href="/participants/edit/{{ participant[0] }}"
+                            class="button"
+                        >
+                            Update
+                        </a>
+
+                        <form
+                            action="/participants/delete/{{ participant[0] }}"
+                            method="POST"
+                            class="inline-form"
+                        >
+                            <button type="submit" class="delete">
+                                Delete
+                            </button>
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="6">No participant records found.</td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		registration.html
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Participant Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="header">
+        <h2>Events Registration System</h2>
+        <a href="/" class="logout">Dashboard</a>
+    </div>
+
+    <div class="navigation">
+        <a href="/">Dashboard</a>
+        <a href="/events">Events</a>
+        <a href="/participants">Participants</a>
+        <a href="/registration" class="active">Registration</a>
+        <a href="/monitoring">Monitoring</a>
+    </div>
+
+    <div class="container">
+
+        <h2>Participant Registration</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="success">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
+        <!-- NEW REGISTRATION -->
+        <div class="section">
+
+            <h3 class="section-title">Register Participant</h3>
+
+            <form action="/registration/add" method="POST">
+
+                <div class="form-group">
+                    <label>Participant:</label>
+
+                    <select name="partID" required>
+                        <option value="">-- Select Participant --</option>
+
+                        {% for participant in participants %}
+                            <option value="{{ participant[0] }}">
+                                {{ participant[1] }} {{ participant[2] }}
+                                - {{ participant[3] }}
+                            </option>
+                        {% endfor %}
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Registration Date:</label>
+                    <input type="date" name="regDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Mode:</label>
+
+                    <select name="regPayMode" required>
+                        <option value="">-- Select Payment Mode --</option>
+                        <option value="Cash">Cash</option>
+                        <option value="GCash">GCash</option>
+                        <option value="Bank">Bank</option>
+                    </select>
+                </div>
+
+                <button type="submit">Register Participant</button>
+                <button type="reset" class="secondary">Clear</button>
+
+            </form>
+
+        </div>
+
+
+        <!-- REGISTRATION RECORDS -->
+        <div class="section">
+
+            <h3 class="section-title">Registration Records</h3>
+
+            <table>
+
+                <tr>
+                    <th>Registration ID</th>
+                    <th>Participant ID</th>
+                    <th>Participant Name</th>
+                    <th>Event</th>
+                    <th>Date</th>
+                    <th>Fee Paid</th>
+                    <th>Payment Mode</th>
+                    <th>Actions</th>
+                </tr>
+
+                {% for record in registrations %}
+
+                <tr>
+
+                    <td>{{ record[0] }}</td>
+                    <td>{{ record[1] }}</td>
+
+                    <td>
+                        {{ record[2] }} {{ record[3] }}
+                    </td>
+
+                    <td>{{ record[4] }}</td>
+                    <td>{{ record[5] }}</td>
+
+                    <td>
+                        ₱{{ "%.2f"|format(record[6]|float) }}
+                    </td>
+
+                    <td>{{ record[7] }}</td>
+
+                    <td>
+
+                        <a href="/registration/edit/{{ record[0] }}"
+                           style="background: #1769AA; color: white;
+                           padding: 7px 12px; text-decoration: none;
+                           border-radius: 4px; display: inline-block;">
+                            Edit
+                        </a>
+
+                        <form action="/registration/delete/{{ record[0] }}"
+                              method="POST"
+                              style="display: inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this registration?');">
+
+                            <button type="submit"
+                                    style="background: #dc3545; color: white;
+                                    padding: 7px 12px; border: none;
+                                    border-radius: 4px; cursor: pointer;">
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="8">
+                        No registration records found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	app.py
+
+
+from flask import Flask, render_template, request, redirect, url_for, flash
+import mysql.connector
+
+app = Flask(__name__)
+app.secret_key = "events_registration_secret"
+
+
+# DATABASE CONNECTION
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="events_registration_db",
+        port=3306
+    )
+
+
+# DASHBOARD
+@app.route("/")
+def dashboard():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM events")
+    events_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM participants")
+    participants_count = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM registration")
+    registrations_count = cursor.fetchone()[0]
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "index.html",
+        events_count=events_count,
+        participants_count=participants_count,
+        registrations_count=registrations_count
+    )
+
+
+# EVENTS MANAGEMENT
+@app.route("/events")
+def events():
+
+    search = request.args.get("search", "")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = "SELECT * FROM events"
+
+    if search:
+        sql += " WHERE evName LIKE %s"
+        cursor.execute(sql, ("%" + search + "%",))
+    else:
+        cursor.execute(sql)
+
+    records = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "events.html",
+        events=records,
+        search=search
+    )
+
+
+# ADD EVENT
+
+@app.route("/events/add", methods=["POST"])
+def add_event():
+
+    evName = request.form["evName"]
+    evDate = request.form["evDate"]
+    evVenue = request.form["evVenue"]
+    evRFee = request.form["evRFee"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = """
+        INSERT INTO events
+        (evName, evDate, evVenue, evRFee)
+        VALUES (%s, %s, %s, %s)
+    """
+
+    values = (evName, evDate, evVenue, evRFee)
+
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+
+        flash("Event added successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error adding event: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("events"))
+
+
+@app.route("/events/edit/<int:evCode>")
+def edit_event(evCode):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "SELECT * FROM events WHERE evCode = %s",
+            (evCode,)
+        )
+
+        record = cursor.fetchone()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    if record is None:
+        flash("Event not found!")
+        return redirect(url_for("events"))
+
+    return render_template("edit_event.html", event=record)
+
+# UPDATE EVENT PAGE
+
+@app.route("/events/update/<int:evCode>", methods=["POST"])
+def update_event(evCode):
+
+    evName = request.form["evName"]
+    evDate = request.form["evDate"]
+    evVenue = request.form["evVenue"]
+    evRFee = request.form["evRFee"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = """
+        UPDATE events
+        SET evName = %s,
+            evDate = %s,
+            evVenue = %s,
+            evRFee = %s
+        WHERE evCode = %s
+    """
+
+    values = (evName, evDate, evVenue, evRFee, evCode)
+
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+
+        flash("Event updated successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error updating event: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("events"))
+
+
+# SAVE UPDATED EVENT
+
+# DELETE EVENT
+
+@app.route("/events/delete/<int:evCode>", methods=["POST"])
+def delete_event(evCode):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # CHECK EXISTING PARTICIPANTS
+        cursor.execute(
+            "SELECT COUNT(*) FROM participants WHERE evCode = %s",
+            (evCode,)
+        )
+
+        count = cursor.fetchone()[0]
+
+        if count > 0:
+            flash("Cannot delete event! Participants are registered under this event.")
+
+        else:
+            cursor.execute(
+                "DELETE FROM events WHERE evCode = %s",
+                (evCode,)
+            )
+
+            conn.commit()
+            flash("Event deleted successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting event: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("events"))
+
+
+# PARTICIPANTS MANAGEMENT
+@app.route("/participants")
+def participants():
+
+    search = request.args.get("search", "")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        sql = """
+            SELECT
+                p.partID,
+                p.evCode,
+                p.partFName,
+                p.partLName,
+                p.partDRate,
+                e.evName
+            FROM participants p
+            LEFT JOIN events e ON p.evCode = e.evCode
+        """
+
+        if search:
+            sql += """
+                WHERE p.partFName LIKE %s
+                OR p.partLName LIKE %s
+            """
+
+            cursor.execute(
+                sql,
+                ("%" + search + "%", "%" + search + "%")
+            )
+
+        else:
+            cursor.execute(sql)
+
+        records = cursor.fetchall()
+
+        cursor.execute(
+            "SELECT evCode, evName FROM events ORDER BY evName"
+        )
+
+        event_list = cursor.fetchall()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template(
+        "participants.html",
+        participants=records,
+        events=event_list,
+        search=search
+    )
+
+
+# ADD PARTICIPANT
+@app.route("/participants/add", methods=["POST"])
+def add_participant():
+
+    evCode = request.form["evCode"]
+    partFName = request.form["partFName"]
+    partLName = request.form["partLName"]
+    partDRate = float(request.form["partDRate"])
+
+    if not 0 <= partDRate <= 100:
+        flash("Discount rate must be between 0 and 100.")
+        return redirect(url_for("participants"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = """
+        INSERT INTO participants
+        (evCode, partFName, partLName, partDRate)
+        VALUES (%s, %s, %s, %s)
+    """
+
+    values = (evCode, partFName, partLName, partDRate)
+
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+
+        flash("Participant added successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error adding participant: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("participants"))
+
+
+# EDIT PARTICIPANT PAGE
+@app.route("/participants/edit/<int:partID>")
+def edit_participant(partID):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT partID, evCode, partFName, partLName, partDRate
+            FROM participants
+            WHERE partID = %s
+            """,
+            (partID,)
+        )
+
+        record = cursor.fetchone()
+
+        cursor.execute(
+            "SELECT evCode, evName FROM events ORDER BY evName"
+        )
+
+        event_list = cursor.fetchall()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    if record is None:
+        flash("Participant not found!")
+        return redirect(url_for("participants"))
+
+    return render_template(
+        "edit_participant.html",
+        participant=record,
+        events=event_list
+    )
+
+
+# UPDATE PARTICIPANT
+@app.route("/participants/update/<int:partID>", methods=["POST"])
+def update_participant(partID):
+
+    evCode = request.form["evCode"]
+    partFName = request.form["partFName"]
+    partLName = request.form["partLName"]
+    partDRate = float(request.form["partDRate"])
+
+    if not 0 <= partDRate <= 100:
+        flash("Discount rate must be between 0 and 100.")
+        return redirect(url_for("edit_participant", partID=partID))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    sql = """
+        UPDATE participants
+        SET evCode = %s,
+            partFName = %s,
+            partLName = %s,
+            partDRate = %s
+        WHERE partID = %s
+    """
+
+    values = (evCode, partFName, partLName, partDRate, partID)
+
+    try:
+        cursor.execute(sql, values)
+        conn.commit()
+
+        flash("Participant updated successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error updating participant: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("participants"))
+
+
+# DELETE PARTICIPANT
+@app.route("/participants/delete/<int:partID>", methods=["POST"])
+def delete_participant(partID):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # CHECK EXISTING REGISTRATIONS
+        cursor.execute(
+            "SELECT COUNT(*) FROM registration WHERE partID = %s",
+            (partID,)
+        )
+
+        count = cursor.fetchone()[0]
+
+        if count > 0:
+            flash(
+                "Cannot delete participant! "
+                "This participant has existing registration records."
+            )
+
+        else:
+            cursor.execute(
+                "DELETE FROM participants WHERE partID = %s",
+                (partID,)
+            )
+
+            conn.commit()
+            flash("Participant deleted successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting participant: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("participants"))
+
+
+# PARTICIPANT REGISTRATION
+@app.route('/registration')
+def registration():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            r.regCode,
+            r.partID,
+            p.partFName,
+            p.partLName,
+            e.evName,
+            r.regDate,
+            r.regFeePaid,
+            r.regPayMode
+        FROM registration r
+        JOIN participants p ON r.partID = p.partID
+        JOIN events e ON p.evCode = e.evCode
+    """)
+
+    registrations = cursor.fetchall()
+
+    cursor.execute("""
+        SELECT
+            p.partID,
+            p.partFName,
+            p.partLName,
+            e.evName,
+            e.evRFee,
+            p.partDRate
+        FROM participants p
+        JOIN events e ON p.evCode = e.evCode
+    """)
+
+    participants = cursor.fetchall()
+
+    cursor.close()
+
+    return render_template(
+        'registration.html',
+        registrations=registrations,
+        participants=participants
+    )
+
+
+# ADD REGISTRATION
+@app.route("/registration/add", methods=["POST"])
+def add_registration():
+
+    partID = request.form["partID"]
+    regDate = request.form["regDate"]
+    regPayMode = request.form["regPayMode"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # GET PARTICIPANT'S EVENT FEE AND DISCOUNT
+        cursor.execute("""
+            SELECT e.evRFee, p.partDRate
+            FROM participants p
+            JOIN events e ON p.evCode = e.evCode
+            WHERE p.partID = %s
+        """, (partID,))
+
+        participant = cursor.fetchone()
+
+        if participant is None:
+            flash("Participant not found!")
+
+        else:
+            event_fee = float(participant[0])
+            discount_rate = float(participant[1])
+
+            discount = event_fee * discount_rate / 100
+            final_fee = event_fee - discount
+
+            # SAVE REGISTRATION
+            sql = """
+                INSERT INTO registration
+                (partID, regDate, regFeePaid, regPayMode)
+                VALUES (%s, %s, %s, %s)
+            """
+
+            values = (
+                partID,
+                regDate,
+                final_fee,
+                regPayMode
+            )
+
+            cursor.execute(sql, values)
+            conn.commit()
+
+            flash(
+                f"Registration successful! "
+                f"Final fee: ₱{final_fee:.2f}"
+            )
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error registering participant: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("registration"))
+
+
+# EDIT REGISTRATION PAGE
+@app.route("/registration/edit/<int:regCode>")
+def edit_registration(regCode):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # GET REGISTRATION DETAILS
+        cursor.execute("""
+            SELECT regCode, partID, regDate, regPayMode
+            FROM registration
+            WHERE regCode = %s
+        """, (regCode,))
+
+        record = cursor.fetchone()
+
+        # GET AVAILABLE PARTICIPANTS
+        cursor.execute("""
+            SELECT
+                p.partID,
+                p.partFName,
+                p.partLName,
+                e.evName
+            FROM participants p
+            JOIN events e ON p.evCode = e.evCode
+            ORDER BY p.partFName
+        """)
+
+        participants_list = cursor.fetchall()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    if record is None:
+        flash("Registration not found!")
+        return redirect(url_for("registration"))
+
+    return render_template(
+        "edit_registration.html",
+        registration=record,
+        participants=participants_list
+    )
+
+
+# UPDATE REGISTRATION
+@app.route("/registration/update/<int:regCode>", methods=["POST"])
+def update_registration(regCode):
+
+    partID = request.form["partID"]
+    regDate = request.form["regDate"]
+    regPayMode = request.form["regPayMode"]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # GET PARTICIPANT'S EVENT FEE AND DISCOUNT
+        cursor.execute("""
+            SELECT e.evRFee, p.partDRate
+            FROM participants p
+            JOIN events e ON p.evCode = e.evCode
+            WHERE p.partID = %s
+        """, (partID,))
+
+        participant = cursor.fetchone()
+
+        if participant is None:
+            flash("Participant not found!")
+
+        else:
+            event_fee = float(participant[0])
+            discount_rate = float(participant[1])
+
+            discount = event_fee * discount_rate / 100
+            final_fee = event_fee - discount
+
+            # UPDATE REGISTRATION
+            cursor.execute("""
+                UPDATE registration
+                SET partID = %s,
+                    regDate = %s,
+                    regFeePaid = %s,
+                    regPayMode = %s
+                WHERE regCode = %s
+            """, (
+                partID,
+                regDate,
+                final_fee,
+                regPayMode,
+                regCode
+            ))
+
+            conn.commit()
+
+            flash(
+                f"Registration updated successfully! "
+                f"Final fee: ₱{final_fee:.2f}"
+            )
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error updating registration: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("registration"))
+
+
+# DELETE REGISTRATION
+@app.route("/registration/delete/<int:regCode>", methods=["POST"])
+def delete_registration(regCode):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            DELETE FROM registration
+            WHERE regCode = %s
+        """, (regCode,))
+
+        conn.commit()
+        flash("Registration deleted successfully!")
+
+    except Exception as e:
+        conn.rollback()
+        flash(f"Error deleting registration: {e}")
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("registration"))
+
+
+# EVENTS REGISTRATION MONITORING
+@app.route("/monitoring")
+def monitoring():
+
+    selected_evCode = request.args.get("evCode", type=int)
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # GET ALL EVENTS FOR THE FILTER
+        cursor.execute("""
+            SELECT evCode, evName
+            FROM events
+            ORDER BY evName
+        """)
+
+        events_list = cursor.fetchall()
+
+        # DEFAULT AGGREGATE VALUES
+        registrations = []
+        total_count = 0
+        total_fees = 0
+        total_discounts = 0
+
+        # GET REGISTRATION RECORDS FOR SELECTED EVENT
+        if selected_evCode is not None:
+
+            cursor.execute("""
+                SELECT
+                    e.evName,
+                    CONCAT(p.partFName, ' ', p.partLName),
+                    r.regDate,
+                    r.regFeePaid
+                FROM registration r
+                JOIN participants p ON r.partID = p.partID
+                JOIN events e ON p.evCode = e.evCode
+                WHERE e.evCode = %s
+                ORDER BY r.regDate DESC, r.regCode DESC
+            """, (selected_evCode,))
+
+            registrations = cursor.fetchall()
+
+            # GET AGGREGATE VALUES
+            cursor.execute("""
+                SELECT
+                    COUNT(r.regCode),
+                    COALESCE(SUM(r.regFeePaid), 0),
+                    (
+                        COUNT(r.regCode) * e.evRFee
+                        - COALESCE(SUM(r.regFeePaid), 0)
+                    )
+                FROM events e
+                LEFT JOIN participants p ON e.evCode = p.evCode
+                LEFT JOIN registration r ON p.partID = r.partID
+                WHERE e.evCode = %s
+                GROUP BY e.evCode, e.evRFee
+            """, (selected_evCode,))
+
+            summary = cursor.fetchone()
+
+            if summary:
+                total_count = summary[0]
+                total_fees = summary[1]
+                total_discounts = summary[2]
+
+    finally:
+        cursor.close()
+        conn.close()
+
+    return render_template(
+        "monitoring.html",
+        events=events_list,
+        registrations=registrations,
+        selected_evCode=selected_evCode,
+        total_count=total_count,
+        total_fees=total_fees,
+        total_discounts=total_discounts
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+	main.py

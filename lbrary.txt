@@ -1,0 +1,868 @@
+python -m pip install mysql-connector-python
+
+import mysql.connector
+
+# DATABASE CONNECTION
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="natingor",
+    port=3306
+)
+
+cursor = conn.cursor()
+
+
+# ==========================================
+# AUTHOR MANAGEMENT
+# ==========================================
+
+def author_management():
+
+    while True:
+
+        print("\n===== AUTHOR MANAGEMENT SYSTEM =====")
+        print("1. Add Author")
+        print("2. Search Author")
+        print("3. Update Author")
+        print("4. Delete Author")
+        print("5. View Authors")
+        print("6. Back to Main Menu")
+
+        choice = input("\nEnter your choice: ")
+
+        # ADD AUTHOR
+        if choice == "1":
+
+            print("\n===== ADD AUTHOR =====")
+
+            authID = int(input("Enter Author ID: "))
+            LName = input("Enter author's Last Name: ")
+            FName = input("Enter author's First Name: ")
+            MName = input("Enter author's Middle Name: ")
+
+            sql = """
+            INSERT INTO author
+            (authID, authLName, authFName, authMName)
+            VALUES (%s, %s, %s, %s)
+            """
+
+            cursor.execute(sql, (authID, LName, FName, MName))
+            conn.commit()
+
+            print("\nAuthor added successfully!")
+
+        # SEARCH AUTHOR
+        elif choice == "2":
+
+            print("\n===== SEARCH AUTHOR =====")
+
+            authID = int(input("Enter Author ID: "))
+
+            cursor.execute(
+                "SELECT * FROM author WHERE authID = %s",
+                (authID,)
+            )
+
+            author = cursor.fetchone()
+
+            if author is None:
+                print("Author not found!")
+
+            else:
+                print("\nAuthor Found!")
+                print("ID:", author[0])
+                print("Last Name:", author[1])
+                print("First Name:", author[2])
+                print("Middle Name:", author[3])
+
+        # UPDATE AUTHOR
+        elif choice == "3":
+
+            print("\n===== UPDATE AUTHOR =====")
+
+            authID = int(input("Enter Author ID: "))
+
+            cursor.execute(
+                "SELECT * FROM author WHERE authID = %s",
+                (authID,)
+            )
+
+            author = cursor.fetchone()
+
+            if author is None:
+                print("Author not found!")
+
+            else:
+                print("Current Last Name:", author[1])
+                print("Current First Name:", author[2])
+                print("Current Middle Name:", author[3])
+
+                LName = input("Enter new Last Name: ")
+                FName = input("Enter new First Name: ")
+                MName = input("Enter new Middle Name: ")
+
+                sql = """
+                UPDATE author
+                SET authLName = %s,
+                    authFName = %s,
+                    authMName = %s
+                WHERE authID = %s
+                """
+
+                cursor.execute(sql, (LName, FName, MName, authID))
+                conn.commit()
+
+                print("\nAuthor updated successfully!")
+
+        # DELETE AUTHOR
+        elif choice == "4":
+
+            print("\n===== DELETE AUTHOR =====")
+
+            authID = int(input("Enter Author ID: "))
+
+            cursor.execute(
+                "SELECT * FROM author WHERE authID = %s",
+                (authID,)
+            )
+
+            author = cursor.fetchone()
+
+            if author is None:
+                print("Author not found!")
+
+            else:
+
+                cursor.execute(
+                    "SELECT * FROM book WHERE authID = %s",
+                    (authID,)
+                )
+
+                books = cursor.fetchall()
+
+                if len(books) > 0:
+                    print("Cannot delete author!")
+                    print("This author still has book records.")
+
+                else:
+                    confirm = input(
+                        "Are you sure you want to delete? (yes/no): "
+                    )
+
+                    if confirm.lower() == "yes":
+
+                        cursor.execute(
+                            "DELETE FROM author WHERE authID = %s",
+                            (authID,)
+                        )
+
+                        conn.commit()
+
+                        print("Author deleted successfully!")
+
+                    else:
+                        print("Deletion cancelled.")
+
+        # VIEW AUTHORS
+        elif choice == "5":
+
+            print("\n===== AUTHOR RECORDS =====")
+
+            cursor.execute("SELECT * FROM author")
+            results = cursor.fetchall()
+
+            if len(results) == 0:
+                print("No author records found.")
+
+            else:
+                for author in results:
+                    print("-------------------------")
+                    print("ID:", author[0])
+                    print("Last Name:", author[1])
+                    print("First Name:", author[2])
+                    print("Middle Name:", author[3])
+
+        elif choice == "6":
+            break
+
+        else:
+            print("Invalid choice!")
+
+
+# ==========================================
+# BOOK MANAGEMENT
+# ==========================================
+
+def book_management():
+
+    while True:
+
+        print("\n===== BOOK MANAGEMENT SYSTEM =====")
+        print("1. Add Book")
+        print("2. Search Book")
+        print("3. Update Book")
+        print("4. Delete Book")
+        print("5. View Books")
+        print("6. Back to Main Menu")
+
+        choice = input("\nEnter your choice: ")
+
+        # ADD BOOK
+        elif_dummy = False
+
+        if choice == "1":
+
+            print("\n===== ADD BOOK =====")
+
+            title = input("Enter Book Title: ")
+            copies = int(input("Enter Number of Copies: "))
+            authID = int(input("Enter Author ID: "))
+
+            cursor.execute(
+                "SELECT * FROM author WHERE authID = %s",
+                (authID,)
+            )
+
+            author = cursor.fetchone()
+
+            if author is None:
+                print("Author not found!")
+
+            else:
+
+                sql = """
+                INSERT INTO book (bookTitle, bookCopies, authID)
+                VALUES (%s, %s, %s)
+                """
+
+                cursor.execute(sql, (title, copies, authID))
+                conn.commit()
+
+                print("\nBook added successfully!")
+                print("Book ID:", cursor.lastrowid)
+
+        # SEARCH BOOK
+        elif choice == "2":
+
+            print("\n===== SEARCH BOOK =====")
+
+            bookID = int(input("Enter Book ID: "))
+
+            cursor.execute(
+                "SELECT * FROM book WHERE bookID = %s",
+                (bookID,)
+            )
+
+            book = cursor.fetchone()
+
+            if book is None:
+                print("Book not found!")
+
+            else:
+                print("\nBook Found!")
+                print("Book ID:", book[0])
+                print("Book Title:", book[1])
+                print("Book Copies:", book[2])
+                print("Author ID:", book[3])
+
+        # UPDATE BOOK
+        elif choice == "3":
+
+            print("\n===== UPDATE BOOK =====")
+
+            bookID = int(input("Enter Book ID: "))
+
+            cursor.execute(
+                "SELECT * FROM book WHERE bookID = %s",
+                (bookID,)
+            )
+
+            book = cursor.fetchone()
+
+            if book is None:
+                print("Book not found!")
+
+            else:
+
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) FROM borrowed_book
+                    WHERE bookID = %s AND status = 'Borrowed'
+                    """,
+                    (bookID,)
+                )
+
+                borrowed = cursor.fetchone()[0]
+
+                print("Current Title:", book[1])
+                print("Current Copies:", book[2])
+                print("Current Author ID:", book[3])
+
+                title = input("Enter new Book Title: ")
+                copies = int(input("Enter new Number of Copies: "))
+                authID = int(input("Enter new Author ID: "))
+
+                cursor.execute(
+                    "SELECT * FROM author WHERE authID = %s",
+                    (authID,)
+                )
+
+                author = cursor.fetchone()
+
+                if author is None:
+                    print("Author not found!")
+
+                elif copies < borrowed:
+                    print("Cannot set copies lower than borrowed copies!")
+
+                else:
+
+                    sql = """
+                    UPDATE book
+                    SET bookTitle = %s,
+                        bookCopies = %s,
+                        authID = %s
+                    WHERE bookID = %s
+                    """
+
+                    cursor.execute(
+                        sql,
+                        (title, copies, authID, bookID)
+                    )
+
+                    conn.commit()
+
+                    print("\nBook updated successfully!")
+
+        # DELETE BOOK
+        elif choice == "4":
+
+            print("\n===== DELETE BOOK =====")
+
+            bookID = int(input("Enter Book ID: "))
+
+            cursor.execute(
+                "SELECT * FROM book WHERE bookID = %s",
+                (bookID,)
+            )
+
+            book = cursor.fetchone()
+
+            if book is None:
+                print("Book not found!")
+
+            else:
+
+                cursor.execute(
+                    "SELECT * FROM borrowed_book WHERE bookID = %s",
+                    (bookID,)
+                )
+
+                records = cursor.fetchall()
+
+                if len(records) > 0:
+                    print("Cannot delete book!")
+                    print("This book has borrowing records.")
+
+                else:
+                    confirm = input(
+                        "Are you sure you want to delete? (yes/no): "
+                    )
+
+                    if confirm.lower() == "yes":
+
+                        cursor.execute(
+                            "DELETE FROM book WHERE bookID = %s",
+                            (bookID,)
+                        )
+
+                        conn.commit()
+
+                        print("Book deleted successfully!")
+
+                    else:
+                        print("Deletion cancelled.")
+
+        # VIEW BOOKS
+        elif choice == "5":
+
+            print("\n===== BOOK RECORDS =====")
+
+            cursor.execute("SELECT * FROM book")
+            results = cursor.fetchall()
+
+            if len(results) == 0:
+                print("No book records found.")
+
+            else:
+                for book in results:
+                    print("-------------------------")
+                    print("Book ID:", book[0])
+                    print("Book Title:", book[1])
+                    print("Book Copies:", book[2])
+                    print("Author ID:", book[3])
+
+        elif choice == "6":
+            break
+
+        else:
+            print("Invalid choice!")
+
+
+# ==========================================
+# STUDENT MANAGEMENT
+# ==========================================
+
+def student_management():
+
+    while True:
+
+        print("\n===== STUDENT MANAGEMENT SYSTEM =====")
+        print("1. Add Student")
+        print("2. Search Student")
+        print("3. Update Student")
+        print("4. Delete Student")
+        print("5. View Students")
+        print("6. Back to Main Menu")
+
+        choice = input("\nEnter your choice: ")
+
+        # ADD STUDENT
+        if choice == "1":
+
+            print("\n===== ADD STUDENT =====")
+
+            studID = int(input("Enter Student ID: "))
+            FName = input("Enter student's First Name: ")
+            MName = input("Enter student's Middle Name: ")
+            LName = input("Enter student's Last Name: ")
+
+            sql = """
+            INSERT INTO student
+            (studID, studFName, studMName, studLName)
+            VALUES (%s, %s, %s, %s)
+            """
+
+            cursor.execute(sql, (studID, FName, MName, LName))
+            conn.commit()
+
+            print("\nStudent added successfully!")
+
+        # SEARCH STUDENT
+        elif choice == "2":
+
+            print("\n===== SEARCH STUDENT =====")
+
+            studID = int(input("Enter Student ID: "))
+
+            cursor.execute(
+                "SELECT * FROM student WHERE studID = %s",
+                (studID,)
+            )
+
+            student = cursor.fetchone()
+
+            if student is None:
+                print("Student not found!")
+
+            else:
+                print("\nStudent Found!")
+                print("Student ID:", student[0])
+                print("First Name:", student[1])
+                print("Middle Name:", student[2])
+                print("Last Name:", student[3])
+
+        # UPDATE STUDENT
+        elif choice == "3":
+
+            print("\n===== UPDATE STUDENT =====")
+
+            studID = int(input("Enter Student ID: "))
+
+            cursor.execute(
+                "SELECT * FROM student WHERE studID = %s",
+                (studID,)
+            )
+
+            student = cursor.fetchone()
+
+            if student is None:
+                print("Student not found!")
+
+            else:
+                print("Current First Name:", student[1])
+                print("Current Middle Name:", student[2])
+                print("Current Last Name:", student[3])
+
+                FName = input("Enter new First Name: ")
+                MName = input("Enter new Middle Name: ")
+                LName = input("Enter new Last Name: ")
+
+                sql = """
+                UPDATE student
+                SET studFName = %s,
+                    studMName = %s,
+                    studLName = %s
+                WHERE studID = %s
+                """
+
+                cursor.execute(
+                    sql,
+                    (FName, MName, LName, studID)
+                )
+
+                conn.commit()
+
+                print("\nStudent updated successfully!")
+
+        # DELETE STUDENT
+        elif choice == "4":
+
+            print("\n===== DELETE STUDENT =====")
+
+            studID = int(input("Enter Student ID: "))
+
+            cursor.execute(
+                "SELECT * FROM student WHERE studID = %s",
+                (studID,)
+            )
+
+            student = cursor.fetchone()
+
+            if student is None:
+                print("Student not found!")
+
+            else:
+
+                cursor.execute(
+                    "SELECT * FROM borrowed_book WHERE studID = %s",
+                    (studID,)
+                )
+
+                records = cursor.fetchall()
+
+                if len(records) > 0:
+                    print("Cannot delete student!")
+                    print("This student has borrowing records.")
+
+                else:
+                    confirm = input(
+                        "Are you sure you want to delete? (yes/no): "
+                    )
+
+                    if confirm.lower() == "yes":
+
+                        cursor.execute(
+                            "DELETE FROM student WHERE studID = %s",
+                            (studID,)
+                        )
+
+                        conn.commit()
+
+                        print("Student deleted successfully!")
+
+                    else:
+                        print("Deletion cancelled.")
+
+        # VIEW STUDENTS
+        elif choice == "5":
+
+            print("\n===== STUDENT RECORDS =====")
+
+            cursor.execute("SELECT * FROM student")
+            results = cursor.fetchall()
+
+            if len(results) == 0:
+                print("No student records found.")
+
+            else:
+                for student in results:
+                    print("-------------------------")
+                    print("Student ID:", student[0])
+                    print("First Name:", student[1])
+                    print("Middle Name:", student[2])
+                    print("Last Name:", student[3])
+
+        elif choice == "6":
+            break
+
+        else:
+            print("Invalid choice!")
+
+
+# ==========================================
+# BOOK BORROWING MANAGEMENT
+# ==========================================
+
+def borrowing_management():
+
+    while True:
+
+        print("\n===== BOOK BORROWING SYSTEM =====")
+        print("1. Check Book Availability")
+        print("2. Borrow Book")
+        print("3. View Borrowed Books")
+        print("4. Return Book")
+        print("5. View Returned Books")
+        print("6. Back to Main Menu")
+
+        choice = input("\nEnter your choice: ")
+
+        # CHECK BOOK AVAILABILITY
+        if choice == "1":
+
+            print("\n===== BOOK AVAILABILITY =====")
+
+            bookID = int(input("Enter Book ID: "))
+
+            cursor.execute(
+                "SELECT * FROM book WHERE bookID = %s",
+                (bookID,)
+            )
+
+            book = cursor.fetchone()
+
+            if book is None:
+                print("Book not found!")
+
+            else:
+
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) FROM borrowed_book
+                    WHERE bookID = %s AND status = 'Borrowed'
+                    """,
+                    (bookID,)
+                )
+
+                borrowed = cursor.fetchone()[0]
+
+                available = book[2] - borrowed
+
+                print("\nBook Title:", book[1])
+                print("Total Copies:", book[2])
+                print("Borrowed Copies:", borrowed)
+                print("Available Copies:", available)
+
+        # BORROW BOOK
+        elif choice == "2":
+
+            print("\n===== BORROW BOOK =====")
+
+            studID = int(input("Enter Student ID: "))
+            bookID = int(input("Enter Book ID: "))
+
+            cursor.execute(
+                "SELECT * FROM student WHERE studID = %s",
+                (studID,)
+            )
+
+            student = cursor.fetchone()
+
+            cursor.execute(
+                "SELECT * FROM book WHERE bookID = %s",
+                (bookID,)
+            )
+
+            book = cursor.fetchone()
+
+            if student is None:
+                print("Student not found!")
+
+            elif book is None:
+                print("Book not found!")
+
+            else:
+
+                cursor.execute(
+                    """
+                    SELECT COUNT(*) FROM borrowed_book
+                    WHERE bookID = %s AND status = 'Borrowed'
+                    """,
+                    (bookID,)
+                )
+
+                borrowed = cursor.fetchone()[0]
+
+                available = book[2] - borrowed
+
+                if available <= 0:
+                    print("No available copies of this book!")
+
+                else:
+
+                    sql = """
+                    INSERT INTO borrowed_book
+                    (studID, bookID, status)
+                    VALUES (%s, %s, %s)
+                    """
+
+                    cursor.execute(
+                        sql,
+                        (studID, bookID, "Borrowed")
+                    )
+
+                    conn.commit()
+
+                    print("\nBook borrowed successfully!")
+                    print("Borrow ID:", cursor.lastrowid)
+
+        # VIEW BORROWED BOOKS
+        elif choice == "3":
+
+            print("\n===== BORROWED BOOK RECORDS =====")
+
+            sql = """
+            SELECT borrowed_book.borrowID,
+                   student.studID,
+                   student.studFName,
+                   student.studLName,
+                   book.bookID,
+                   book.bookTitle,
+                   borrowed_book.status
+            FROM borrowed_book
+            INNER JOIN student
+            ON borrowed_book.studID = student.studID
+            INNER JOIN book
+            ON borrowed_book.bookID = book.bookID
+            WHERE borrowed_book.status = 'Borrowed'
+            """
+
+            cursor.execute(sql)
+
+            results = cursor.fetchall()
+
+            if len(results) == 0:
+                print("No borrowed books found.")
+
+            else:
+                for record in results:
+                    print("-------------------------")
+                    print("Borrow ID:", record[0])
+                    print("Student ID:", record[1])
+                    print("Student Name:", record[2], record[3])
+                    print("Book ID:", record[4])
+                    print("Book Title:", record[5])
+                    print("Status:", record[6])
+
+        # RETURN BOOK
+        elif choice == "4":
+
+            print("\n===== RETURN BOOK =====")
+
+            borrowID = int(input("Enter Borrow ID: "))
+
+            cursor.execute(
+                """
+                SELECT * FROM borrowed_book
+                WHERE borrowID = %s
+                """,
+                (borrowID,)
+            )
+
+            record = cursor.fetchone()
+
+            if record is None:
+                print("Borrow record not found!")
+
+            elif record[3] == "Returned":
+                print("This book has already been returned!")
+
+            else:
+
+                cursor.execute(
+                    """
+                    UPDATE borrowed_book
+                    SET status = 'Returned'
+                    WHERE borrowID = %s
+                    """,
+                    (borrowID,)
+                )
+
+                conn.commit()
+
+                print("\nBook returned successfully!")
+
+        # VIEW RETURNED BOOKS
+        elif choice == "5":
+
+            print("\n===== RETURNED BOOK RECORDS =====")
+
+            sql = """
+            SELECT borrowed_book.borrowID,
+                   student.studFName,
+                   student.studLName,
+                   book.bookTitle,
+                   borrowed_book.status
+            FROM borrowed_book
+            INNER JOIN student
+            ON borrowed_book.studID = student.studID
+            INNER JOIN book
+            ON borrowed_book.bookID = book.bookID
+            WHERE borrowed_book.status = 'Returned'
+            """
+
+            cursor.execute(sql)
+
+            results = cursor.fetchall()
+
+            if len(results) == 0:
+                print("No returned books found.")
+
+            else:
+                for record in results:
+                    print("-------------------------")
+                    print("Borrow ID:", record[0])
+                    print("Student Name:", record[1], record[2])
+                    print("Book Title:", record[3])
+                    print("Status:", record[4])
+
+        elif choice == "6":
+            break
+
+        else:
+            print("Invalid choice!")
+
+
+# ==========================================
+# MAIN SYSTEM
+# ==========================================
+
+while True:
+
+    print("\n====================================")
+    print("       LIBRARY MANAGEMENT SYSTEM")
+    print("====================================")
+    print("1. Author Management")
+    print("2. Book Management")
+    print("3. Student Management")
+    print("4. Book Borrowing")
+    print("5. Exit")
+
+    choice = input("\nEnter your choice: ")
+
+    if choice == "1":
+        author_management()
+
+    elif choice == "2":
+        book_management()
+
+    elif choice == "3":
+        student_management()
+
+    elif choice == "4":
+        borrowing_management()
+
+    elif choice == "5":
+        print("\nThank you for using the Library Management System!")
+        break
+
+    else:
+        print("\nInvalid choice!")
+
+
+# CLOSE DATABASE CONNECTION
+cursor.close()
+conn.close()
