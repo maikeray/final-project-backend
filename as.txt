@@ -1,0 +1,149 @@
+import mysql.connector
+
+# DATABASE CONNECTION
+conn = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="",
+    database="main_db",
+    port=3306
+)
+
+cursor = conn.cursor()
+
+# MAIN SYSTEM
+while True:
+
+    print("\n===== STUDENT MANAGEMENT SYSTEM =====")
+    print("1. Add Student")
+    print("2. View Students")
+    print("3. Update Student")
+    print("4. Delete Student")
+    print("5. Exit")
+
+    choice = input("\nEnter your choice: ")
+
+    # CREATE
+    if choice == "1":
+
+        print("\n===== ADD STUDENT =====")
+
+        name = input("Enter name: ")
+        age = int(input("Enter age: "))
+        course = input("Enter course: ")
+
+        sql = "INSERT INTO students (name, age, course) VALUES (%s, %s, %s)"
+        values = (name, age, course)
+
+        cursor.execute(sql, values)
+        conn.commit()
+
+        print("\nStudent successfully added!")
+
+    # READ
+    elif choice == "2":
+
+        print("\n===== STUDENT RECORDS =====")
+
+        sql = "SELECT * FROM students"
+        cursor.execute(sql)
+
+        results = cursor.fetchall()
+
+        if len(results) == 0:
+            print("No student records found.")
+
+        else:
+            for student in results:
+                print("-------------------------")
+                print("ID:", student[0])
+                print("Name:", student[1])
+                print("Age:", student[2])
+                print("Course:", student[3])
+
+    # UPDATE
+    elif choice == "3":
+
+        print("\n===== UPDATE STUDENT =====")
+
+        student_id = int(input("Enter student ID: "))
+
+        cursor.execute(
+            "SELECT * FROM students WHERE id = %s",
+            (student_id,)
+        )
+
+        student = cursor.fetchone()
+
+        if student is None:
+            print("Student not found!")
+
+        else:
+            print("Current name:", student[1])
+            print("Current age:", student[2])
+            print("Current course:", student[3])
+
+            name = input("Enter new name: ")
+            age = int(input("Enter new age: "))
+            course = input("Enter new course: ")
+
+            sql = """
+            UPDATE students
+            SET name = %s, age = %s, course = %s
+            WHERE id = %s
+            """
+
+            values = (name, age, course, student_id)
+
+            cursor.execute(sql, values)
+            conn.commit()
+
+            print("\nStudent successfully updated!")
+
+    # DELETE
+    elif choice == "4":
+
+        print("\n===== DELETE STUDENT =====")
+
+        student_id = int(input("Enter student ID: "))
+
+        cursor.execute(
+            "SELECT * FROM students WHERE id = %s",
+            (student_id,)
+        )
+
+        student = cursor.fetchone()
+
+        if student is None:
+            print("Student not found!")
+
+        else:
+            print("Student:", student[1])
+
+            confirm = input("Are you sure you want to delete? (yes/no): ")
+
+            if confirm.lower() == "yes":
+
+                cursor.execute(
+                    "DELETE FROM students WHERE id = %s",
+                    (student_id,)
+                )
+
+                conn.commit()
+
+                print("Student successfully deleted!")
+
+            else:
+                print("Deletion cancelled.")
+
+    # EXIT
+    elif choice == "5":
+
+        print("\nThank you for using the system!")
+        break
+
+    else:
+        print("\nInvalid choice!")
+
+cursor.close()
+conn.close()
