@@ -1,0 +1,13 @@
+services.msc win+r stop mysql80 (in case)
+download python
+xampp
+download python in vsc
+
+// database connector //
+
+python -m pip install mysql-connector-python 
+
+xampp/htdocs/natingor
+natingor.py
+
+python -m pip install mysql-connector-python
